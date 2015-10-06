@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <style>
+        .selected{
+            background-color: blue;
+        }
+
+        .excluded{
+            background-color: red;
+        }
+
+        .selected.current-and-future{
+            background-color: green;
+        }
+
+        .child-selected{
+            background-color: yellow;
+        }
+    </style>
+</head>
+<body>
+    <div id="vehicle-selector">
+        <ul data-bind="foreach: manufacturers">
+            <li>
+                <span data-bind="text: name, click: toggleExpand, css: statusCss"></span>
+                <button data-bind="click: toggleSelect">Select Current</button>
+                <ul data-bind="visible:isExpanded, foreach: models">
+                    <li>
+                        <span data-bind="text: name, click: toggleExpand, css: statusCss"></span>
+                        <button data-bind="click: toggleSelect">Select Current</button>
+                        <ul data-bind="visible:isExpanded, foreach: variants">
+                            <li>
+                                <span data-bind="text: name, click: toggleSelect, css: statusCss"></span>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</body>
+</html>
+<script src="knockout-3.3.0.js"></script>
+<script src="proxy.js"></script>
+<script src="node.js"></script>
+<script src="variant.js"></script>
+<script src="model.js"></script>
+<script src="manufacturer.js"></script>
+<script src="manufacturerGroup.js"></script>
+<script src="app.js"></script>
