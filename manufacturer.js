@@ -7,7 +7,7 @@ function Manufacturer(id, name){
     this.models.areLoaded = ko.observable();
     this.isExpanded = ko.observable();
 
-    var selectedModelsCount = 0;
+    var selectedModelsCount = ko.observable(0);
 
     this.toggleExpand = function(){
         this.isExpanded(!this.isExpanded());
@@ -25,8 +25,8 @@ function Manufacturer(id, name){
         }.bind(this));
     };
 
-    this.hasSelectedModelsOrVariants = function(){
-        if(selectedModelsCount > 0) return true;
+    this.hasSelectedModelsOrVariants = ko.computed(function(){
+        if(selectedModelsCount() > 0) return true;
         for (var i = 0; i < this.models(); i++) {
             if(this.models()[i].hasSelectedVariants()){
                 return true;
@@ -34,11 +34,26 @@ function Manufacturer(id, name){
             }
         }
         return false;
-    };
+    }, this);
+
+    ko.computed(setStatus, this);
+
+    function setStatus(){
+        if(this.isSelected()){
+            this.statusCss('selected');
+            return;
+        }
+
+        if(this.hasSelectedModelsOrVariants()){
+            this.statusCss('child-selected');
+            return;
+        }
+
+        this.statusCss('not-selected');
+    }
 
     this.isSelected.subscribe(function(isSelected){
         if(isSelected){
-            this.statusCss('selected');
             for (var i = 0; i < this.models().length; i++) {
                 this.models()[i].select();
             }
@@ -48,21 +63,15 @@ function Manufacturer(id, name){
         for (var i = 0; i < this.models().length; i++) {
             this.models()[i].deselect();
         }
-
-        if(this.hasSelectedModelsOrVariants()){
-            this.statusCss('child-selected');
-            return;
-        }
-
-        this.statusCss('not-selected');
-
     }, this)
 
     function addModel(model){
-        if(this.isSelected) model.select();
+        if(this.isSelected()) model.select();
         model.manufacturer = this;
         model.onToggle(function(isSelected){
-            isSelected ? selectedModelsCount++ : selectedModelsCount--;
+            isSelected
+                ? selectedModelsCount(selectedModelsCount() + 1)
+                : selectedModelsCount(selectedModelsCount() - 1);
         }.bind(this))
 
         this.models.push(model);

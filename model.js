@@ -15,7 +15,7 @@ function Model(id, name){
         this.variants.areLoaded(true);
     }.bind(this);
 
-    var selectedVariantsCount = 0;
+    var selectedVariantsCount = ko.observable(0);
 
     function loadVariants(){
         proxy.getVariants({}, function(response){
@@ -26,21 +26,16 @@ function Model(id, name){
         }.bind(this));
     };
 
-    this.hasSelectedVariants = function(){
-        return selectedVariantsCount > 0;
-    };
+    this.hasSelectedVariants = ko.computed(function(){
+        return selectedVariantsCount() > 0;
+    }, this);
 
-    this.isSelected.subscribe(function(isSelected){
-        if(isSelected){
+    ko.computed(setStatus, this);
+
+    function setStatus(){
+        if(this.isSelected()){
             this.statusCss('selected');
-            for (var i = 0; i < this.variants().length; i++) {
-                this.variants()[i].select();
-            }
             return;
-        }
-
-        for (var i = 0; i < this.models().length; i++) {
-            this.models()[i].deselect();
         }
 
         if(this.hasSelectedVariants()){
@@ -49,14 +44,29 @@ function Model(id, name){
         }
 
         this.statusCss('not-selected');
+    }
 
+
+    this.isSelected.subscribe(function(isSelected){
+        if(isSelected){
+            for (var i = 0; i < this.variants().length; i++) {
+                this.variants()[i].select();
+            }
+            return;
+        }
+
+        for (var i = 0; i < this.variants().length; i++) {
+            this.variants()[i].deselect();
+        }
     }, this)
 
     function addVariant(variant){
-        if(this.isSelected) variant.select();
+        if(this.isSelected()) variant.select();
         variant.model = this;
         variant.onToggle(function(isSelected){
-            isSelected ? selectedVariantsCount++ : selectedVariantsCount--;
+            isSelected
+                ? selectedVariantsCount(selectedVariantsCount() + 1)
+                : selectedVariantsCount(selectedVariantsCount() - 1);
         }.bind(this))
 
         this.variants.push(variant);

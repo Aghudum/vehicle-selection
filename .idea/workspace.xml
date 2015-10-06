@@ -26,7 +26,7 @@
       <file leaf-file-name="index.html" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/index.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="26" column="64" selection-start="529" selection-end="541" vertical-scroll-proportion="-16.25" vertical-offset="0" max-vertical-offset="855">
+            <state line="30" column="24" selection-start="841" selection-end="841" vertical-scroll-proportion="-18.75" vertical-offset="0" max-vertical-offset="885">
               <folding />
             </state>
           </provider>
@@ -65,10 +65,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="model.js" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="model.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/model.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="39" column="9" selection-start="1196" selection-end="1196" vertical-scroll-proportion="0.43593314" vertical-offset="242" max-vertical-offset="1020">
+            <state line="32" column="4" selection-start="969" selection-end="1290" vertical-scroll-proportion="0.0" vertical-offset="287" max-vertical-offset="1170">
               <folding>
                 <element signature="n#!!doc;n#Model#0" expanded="false" />
               </folding>
@@ -76,10 +76,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="manufacturer.js" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="manufacturer.js" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/manufacturer.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="45" column="9" selection-start="1348" selection-end="1348" vertical-scroll-proportion="0.0" vertical-offset="332" max-vertical-offset="1110">
+            <state line="34" column="9" selection-start="1083" selection-end="1083" vertical-scroll-proportion="0.24791086" vertical-offset="302" max-vertical-offset="1245">
               <folding>
                 <element signature="n#!!doc;n#Manufacturer#0" expanded="false" />
               </folding>
@@ -122,11 +122,11 @@
         <option value="$PROJECT_DIR$/proxy.js" />
         <option value="$PROJECT_DIR$/manufacturerGroup.js" />
         <option value="$PROJECT_DIR$/app.js" />
-        <option value="$PROJECT_DIR$/index.html" />
         <option value="$PROJECT_DIR$/variant.js" />
-        <option value="$PROJECT_DIR$/manufacturer.js" />
         <option value="$PROJECT_DIR$/node.js" />
+        <option value="$PROJECT_DIR$/index.html" />
         <option value="$PROJECT_DIR$/model.js" />
+        <option value="$PROJECT_DIR$/manufacturer.js" />
       </list>
     </option>
   </component>
@@ -330,13 +330,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/index.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="26" column="64" selection-start="529" selection-end="541" vertical-scroll-proportion="-16.25" vertical-offset="0" max-vertical-offset="855">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/node.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="19" column="31" selection-start="384" selection-end="384" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="585">
@@ -346,20 +339,27 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/manufacturer.js">
+    <entry file="file://$PROJECT_DIR$/index.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="45" column="9" selection-start="1348" selection-end="1348" vertical-scroll-proportion="0.0" vertical-offset="332" max-vertical-offset="1110">
-          <folding>
-            <element signature="n#!!doc;n#Manufacturer#0" expanded="false" />
-          </folding>
+        <state line="30" column="24" selection-start="841" selection-end="841" vertical-scroll-proportion="-18.75" vertical-offset="0" max-vertical-offset="885">
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/model.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="39" column="9" selection-start="1196" selection-end="1196" vertical-scroll-proportion="0.43593314" vertical-offset="242" max-vertical-offset="1020">
+        <state line="32" column="4" selection-start="969" selection-end="1290" vertical-scroll-proportion="0.0" vertical-offset="287" max-vertical-offset="1170">
           <folding>
             <element signature="n#!!doc;n#Model#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/manufacturer.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="34" column="9" selection-start="1083" selection-end="1083" vertical-scroll-proportion="0.24791086" vertical-offset="302" max-vertical-offset="1245">
+          <folding>
+            <element signature="n#!!doc;n#Manufacturer#0" expanded="false" />
           </folding>
         </state>
       </provider>

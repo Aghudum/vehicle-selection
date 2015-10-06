@@ -25,11 +25,13 @@
         <ul data-bind="foreach: manufacturers">
             <li>
                 <span data-bind="text: name, click: toggleExpand, css: statusCss"></span>
-                <button data-bind="click: toggleSelect">Select Current</button>
+                <button data-bind="click: select, visible: !isSelected()">Select Current</button>
+                <a data-bind="click: deselect, visible: isSelected">Remove All</a>
                 <ul data-bind="visible:isExpanded, foreach: models">
                     <li>
                         <span data-bind="text: name, click: toggleExpand, css: statusCss"></span>
-                        <button data-bind="click: toggleSelect">Select Current</button>
+                        <button data-bind="click: select, visible:!isSelected()">Select Current</button>
+                        <a data-bind="click: deselect, visible: isSelected">Remove All</a>
                         <ul data-bind="visible:isExpanded, foreach: variants">
                             <li>
                                 <span data-bind="text: name, click: toggleSelect, css: statusCss"></span>
