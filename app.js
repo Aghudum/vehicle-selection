@@ -1,15 +1,26 @@
 /**
  * Created by wilok on 05/10/15.
  */
-function App(){
-    var group = new ManufacturerGroup(1, "VW Group");
-    group.toggleExpand();
+require(['VehicleSelector'], function(VehicleSelector){
+	var app = new VehicleSelector();
+	app.init();
+});
 
-    var audi = group.manufacturers()[0];
+define('VehicleSelector', ['ManufacturerGroup', 'knockout'], function(ManufacturerGroup, ko){
+	function VehicleSelector(){
+		this.init = function(){
+		    var vwGroup = new ManufacturerGroup(1, "VW Group");
+		    var nonVwGroup = new ManufacturerGroup(1, "Not VW Group");
 
-    var model = audi.models()[0];
+		    vwGroup.toggleExpand();
 
-    ko.applyBindings(group, document.getElementById("vehicle-selector"));
-}
+		    var audi = vwGroup.manufacturers()[0];
 
-App();
+		    var model = audi.models()[0];
+
+		    ko.applyBindings({groups: [vwGroup, nonVwGroup]}, document.getElementById("vehicle-selector"));
+		};
+	}
+
+	return VehicleSelector;
+});
