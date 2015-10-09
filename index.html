@@ -3,38 +3,56 @@
 <head>
     <title></title>
     <style>
-        .selected{
-            background-color: blue;
+        .selected, .selected.child-selected{
+            background-color: #3a87ad;
         }
 
         .excluded{
-            background-color: red;
+            background-color: #b94a48;
         }
 
-        .selected.current-and-future{
-            background-color: green;
+        .selected.current-and-future, .selected.current-and-future.child-selected{
+            background-color: #468847;
         }
 
         .child-selected{
-            background-color: yellow;
+            background-color: #CCFFFF;
+        }
+
+        span{
+            border: 1px, solid;
+            display: inline;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
     <div id="vehicle-selector">
-        <ul data-bind="foreach: manufacturers">
+        <ul data-bind="foreach: groups">
             <li>
-                <span data-bind="text: name, click: toggleExpand, css: statusCss"></span>
-                <button data-bind="click: select, visible: !isSelected()">Select Current</button>
-                <a data-bind="click: deselect, visible: isSelected">Remove All</a>
-                <ul data-bind="visible:isExpanded, foreach: models">
+                <span data-bind="text: name, click: toggleExpand"></span>
+                <ul data-bind="visible: isExpanded, foreach: manufacturers">
                     <li>
-                        <span data-bind="text: name, click: toggleExpand, css: statusCss"></span>
-                        <button data-bind="click: select, visible:!isSelected()">Select Current</button>
+                        <span data-bind="text: name, click: toggleExpand,
+                         css: { selected: isSelected(), 'current-and-future': date() == null, 'child-selected':  hasSelectedModels() || hasSelectedVariants()}"></span>
+                        <span data-bind="visible: hasSelectedVariants(), text: selectedVariantsCount"></span>
+                        <button data-bind="click: select.currentAndFuture, visible: !isSelected()">Select current and future</button>                        
+                        <button data-bind="click: select.currentOnly, visible: !isSelected()">Select current only</button>
                         <a data-bind="click: deselect, visible: isSelected">Remove All</a>
-                        <ul data-bind="visible:isExpanded, foreach: variants">
+                        <ul data-bind="visible: isExpanded, foreach: models()">
                             <li>
-                                <span data-bind="text: name, click: toggleSelect, css: statusCss"></span>
+                                <span data-bind="text: name, click: toggleExpand,
+                                 css: { selected: isSelected(), 'current-and-future': date() == null, excluded: isExcluded(), 'child-selected': hasSelectedVariants() }"></span>
+                                 <span data-bind="visible: hasSelectedVariants(), text: variants.selectedCount"></span>
+                                <button data-bind="click: select.currentAndFuture, visible:!isSelected()">Select current and future</button>
+                                <button data-bind="click: select.currentOnly, visible:!isSelected()">Select current only</button>
+                                <a data-bind="click: deselect, visible: isSelected() && !manufacturer.isSelected()">Remove All</a>                                
+                                <a data-bind="click: exclude, visible: isSelected() && manufacturer.isSelected()">Exclude All</a>
+                                <ul data-bind="visible: isExpanded, foreach: variants">
+                                    <li>
+                                        <span data-bind="text: name, click: toggleSelect, css: { selected: isSelected(), excluded: isExcluded() }"></span>
+                                    </li>
+                                </ul>
                             </li>
                         </ul>
                     </li>
@@ -45,10 +63,18 @@
 </body>
 </html>
 <script src="knockout-3.3.0.js"></script>
+<script src="lodash.js"></script>
+<script src="ferdinand.js"></script>
+<script src="vendor.js"></script>
 <script src="proxy.js"></script>
 <script src="node.js"></script>
+<script src="selectableNode.js"></script>
+<script src="selection.js"></script>
 <script src="variant.js"></script>
 <script src="model.js"></script>
 <script src="manufacturer.js"></script>
 <script src="manufacturerGroup.js"></script>
 <script src="app.js"></script>
+<script>
+    require.printUnresolvedDependencies();
+</script>
