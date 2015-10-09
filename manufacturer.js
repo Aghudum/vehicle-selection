@@ -1,79 +1,97 @@
 /**
  * Created by wilok on 05/10/15.
  */
-function Manufacturer(id, name){
-    SelectableNode.call(this, id, name);
-    this.models = ko.observableArray();
-    this.models.areLoaded = ko.observable();
-    this.isExpanded = ko.observable();
+define('Manufacturer', [ 'knockout', 'lodash', 'SelectableNode', 'Model', 'proxy', 'selection'], function(ko, _, SelectableNode, Model, proxy, selection){
+    function Manufacturer(id, name){
+        SelectableNode.call(this, id, name);
+        this.models = ko.observable([]);
+        this.models.areLoaded = ko.observable();
+        this.models.selectedCount = ko.observable(0);
+        this.selectedVariantsCount = ko.observable(0);
+        this.isExpanded = ko.observable();
+        this.date = ko.observable(null);
 
-    var selectedModelsCount = ko.observable(0);
+        this.select.currentOnly = function(){
+            this.date(new Date());
+            this.select();
+        };
 
-    this.toggleExpand = function(){
-        this.isExpanded(!this.isExpanded());
-        if(this.models.areLoaded()) return;
-        loadModels.call(this);
-        this.models.areLoaded(true);
-    }.bind(this);
+        this.select.currentAndFuture = function(){
+            this.date(null);
+            this.select();
+        };
+
+        this.hasSelectedModels = ko.computed(function(){
+            return this.models.selectedCount() > 0;
+        }, this);
+
+        this.hasSelectedVariants = ko.computed(function(){
+            return this.selectedVariantsCount() > 0;
+        }, this);
+
+        this.isSelected.subscribe(function(isSelected){
+            if(isSelected){
+                addToSelection.call(this);
+            }
+            else{
+                removeFromSelection.call(this);
+            }       
+        }, this);
+    }
+
+    function removeFromSelection(){
+        _.remove(selection, function(item){
+            return item.manufacturerId == this.id();
+        }, this);
+    }
+
+    function addToSelection(){
+        removeFromSelection.call(this);
+        selection.push({manufacturerId : this.id(), date: this.date()}); 
+    }
 
     function loadModels(){
+        var models = [];
         proxy.getModels({}, function(response){
             for (var i = 0; i < response.length; i++) {
-                var model = response[i];
-                addModel.call(this, new Model(model.Id, model.Name));
+                models.push(createModel.call(this, response[i]));
             }
         }.bind(this));
+        this.models(models);
     };
 
-    this.hasSelectedModelsOrVariants = ko.computed(function(){
-        if(selectedModelsCount() > 0) return true;
-        for (var i = 0; i < this.models(); i++) {
-            if(this.models()[i].hasSelectedVariants()){
-                return true;
-                break;
-            }
-        }
-        return false;
-    }, this);
+    function createModel(value){
+        var model = new Model(value.Id, value.Name, this);
 
-    ko.computed(setStatus, this);
+        model.isSelected.subscribe(function(value){
+            var initialCount = this.models.selectedCount();
+            value ? this.models.selectedCount(initialCount + 1)
+                : this.models.selectedCount(initialCount - 1);
+        }, this);
 
-    function setStatus(){
-        if(this.isSelected()){
-            this.statusCss('selected');
-            return;
-        }
+        model.variants.selectedCount.subscribe(function(count){
+            this.selectedVariantsCount(this.selectedVariantsCount() - count);
+        }, this, 'beforeChange');
 
-        if(this.hasSelectedModelsOrVariants()){
-            this.statusCss('child-selected');
-            return;
+        model.variants.selectedCount.subscribe(function(count){
+            this.selectedVariantsCount(this.selectedVariantsCount() + count);
+        }, this);
+
+        if(this.isSelected()) {
+            model.select();
         }
 
-        this.statusCss('not-selected');
+        return model;       
     }
 
-    this.isSelected.subscribe(function(isSelected){
-        if(isSelected){
-            for (var i = 0; i < this.models().length; i++) {
-                this.models()[i].select();
-            }
-            return;
+    Manufacturer.prototype.toggleExpand = function(){
+        this.isExpanded(!this.isExpanded());
+
+        if(!this.models.areLoaded()) {
+            loadModels.call(this);
+            this.models.areLoaded(true);
         }
+    };
 
-        for (var i = 0; i < this.models().length; i++) {
-            this.models()[i].deselect();
-        }
-    }, this)
-
-    function addModel(model){
-        if(this.isSelected()) model.select();
-        model.manufacturer = this;
-        model.onToggle(function(isSelected){
-            isSelected
-                ? selectedModelsCount(selectedModelsCount() + 1)
-                : selectedModelsCount(selectedModelsCount() - 1);
-        }.bind(this))
-
-        this.models.push(model);
-    }
-}
+    return Manufacturer;
+});
