@@ -1,8 +1,10 @@
 /**
  * Created by wilok on 05/10/15.
  */
-define('Manufacturer', [ 'knockout', 'lodash', 'SelectableNode', 'Model', 'proxy', 'selection'], function(ko, _, SelectableNode, Model, proxy, selection){
-    function Manufacturer(id, name){
+define('Manufacturer', [ 'knockout', 'lodash', 'SelectableNode', 'Model', 'proxy'], function(ko, _, SelectableNode, Model, proxy){
+    var selection;
+    function Manufacturer(id, name, savedSelection){
+        selection = savedSelection;
         SelectableNode.call(this, id, name);
         this.models = ko.observable([]);
         this.models.areLoaded = ko.observable();
@@ -29,38 +31,40 @@ define('Manufacturer', [ 'knockout', 'lodash', 'SelectableNode', 'Model', 'proxy
             return this.selectedVariantsCount() > 0;
         }, this);
 
-        this.isSelected.subscribe(function(isSelected){
-            if(isSelected){
-                addToSelection.call(this);
-            }
-            else{
-                removeFromSelection.call(this);
-            }       
-        }, this);
+        this.load = load.bind(this);
     }
 
-    function removeFromSelection(){
-        _.remove(selection, function(item){
-            return item.manufacturerId == this.id();
-        }, this);
+    function load(criteria){
+        var manufacturerCriteria = _.find(criteria, function(criterion){
+            return criterion.modelId === null && criterion.variantId === null;
+        });
+
+        if(manufacturerCriteria){
+            this.isSelected(true);
+            this.date(criterion.date);
+        }
+
+        var modelCriteria = _.find(criteria, function(criterion){
+            return criterion.manufacturerId === this.id() && criterion.modelId !== null;
+        });
+
+        if(modelCriteria){
+            loadModels.call(this, modelCriteria)
+            this.models.areLoaded(true);
+        }
     }
 
-    function addToSelection(){
-        removeFromSelection.call(this);
-        selection.push({manufacturerId : this.id(), date: this.date()}); 
-    }
-
-    function loadModels(){
+    function loadModels(saved){
         var models = [];
         proxy.getModels({}, function(response){
             for (var i = 0; i < response.length; i++) {
-                models.push(createModel.call(this, response[i]));
+                models.push(createModel.call(this, response[i], saved));
             }
         }.bind(this));
         this.models(models);
     };
 
-    function createModel(value){
+    function createModel(value, saved){
         var model = new Model(value.Id, value.Name, this);
 
         model.isSelected.subscribe(function(value){
@@ -81,6 +85,9 @@ define('Manufacturer', [ 'knockout', 'lodash', 'SelectableNode', 'Model', 'proxy
             model.select();
         }
 
+        var criteria = _.find(saved, { modelId: model.id() });
+        model.load(criteria);
+
         return model;       
     }
 
@@ -88,7 +95,7 @@ define('Manufacturer', [ 'knockout', 'lodash', 'SelectableNode', 'Model', 'proxy
         this.isExpanded(!this.isExpanded());
 
         if(!this.models.areLoaded()) {
-            loadModels.call(this);
+            loadModels.call(this, []);
             this.models.areLoaded(true);
         }
     };
