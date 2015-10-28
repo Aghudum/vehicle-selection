@@ -1,3 +1,0 @@
-define('selection', [], function(){
-	return [];
-});
