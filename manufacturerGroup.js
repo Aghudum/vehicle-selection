@@ -23,8 +23,10 @@ define('ManufacturerGroup', ['knockout','Manufacturer', 'proxy', 'Node', 'lodash
             for (var i = 0; i < response.length; i++) {
                 var manufacturerDto = response[i];
                 var manufacturer = new Manufacturer(manufacturerDto.Id, manufacturerDto.Name, selection);
-                var manufacturerCriteria = _.find(selection, { manufacturerId : manufacturerDto.Id});
-                if(manufacturerCriteria){
+
+                var manufacturerCriteria = _.filter(selection, { manufacturerId : manufacturerDto.Id});
+
+                if(manufacturerCriteria.length > 0){
                     manufacturer.load(manufacturerCriteria);
                 }
                 manufacturers.push(manufacturer);

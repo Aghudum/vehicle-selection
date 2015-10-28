@@ -35,36 +35,36 @@ define('Manufacturer', [ 'knockout', 'lodash', 'SelectableNode', 'Model', 'proxy
     }
 
     function load(criteria){
-        var manufacturerCriteria = _.find(criteria, function(criterion){
-            return criterion.modelId === null && criterion.variantId === null;
-        });
+        var manufacturerCriterion = _.find(criteria, function(c){
+            return c.modelId === null;
+        }, this);
 
-        if(manufacturerCriteria){
+        if(manufacturerCriterion){
             this.isSelected(true);
-            this.date(criterion.date);
+            this.date(manufacturerCriterion.date);
         }
 
-        var modelCriteria = _.find(criteria, function(criterion){
-            return criterion.manufacturerId === this.id() && criterion.modelId !== null;
-        });
+        var modelsCriteria = _.filter(criteria, function(c){
+            return c.modelId !== null;
+        }, this);
 
-        if(modelCriteria){
-            loadModels.call(this, modelCriteria)
+        if(modelsCriteria.length > 0){
+            loadModels.call(this, modelsCriteria)
             this.models.areLoaded(true);
         }
     }
 
-    function loadModels(saved){
+    function loadModels(criteria){
         var models = [];
         proxy.getModels({}, function(response){
             for (var i = 0; i < response.length; i++) {
-                models.push(createModel.call(this, response[i], saved));
+                models.push(createModel.call(this, response[i], criteria));
             }
         }.bind(this));
         this.models(models);
-    };
+    }
 
-    function createModel(value, saved){
+    function createModel(value, criteria){
         var model = new Model(value.Id, value.Name, this);
 
         model.isSelected.subscribe(function(value){
@@ -85,8 +85,10 @@ define('Manufacturer', [ 'knockout', 'lodash', 'SelectableNode', 'Model', 'proxy
             model.select();
         }
 
-        var criteria = _.find(saved, { modelId: model.id() });
-        model.load(criteria);
+        var modelCriteria = _.filter(criteria, { modelId: model.id() });
+        if(modelCriteria.length > 0){
+            model.load(modelCriteria);
+        }
 
         return model;       
     }

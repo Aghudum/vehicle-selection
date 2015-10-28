@@ -41,20 +41,21 @@
         }, this);
 
         this.load = function(criteria){
-            var modelCriterion = _.find(criteria, function(criterion){
-                return criterion.modelId === this.id() && criterion.variantId === null;
-            })
+            var modelCriterion = _.find(criteria, function(c){
+                return c.modelId === this.id() && c.variantId === null;
+            }, this)
 
             if(modelCriterion){
                 this.date(modelCriterion.date);
+                this.isSelected(!modelCriterion.isExcluded);
             }
 
-            var variantCriteria = _.find(criteria, function(criterion){
-                return criterion.modelId === this.id() && criterion.variantId !== null;
-            })
+            var variantsCriteria = _.filter(criteria, function(c){
+                return c.modelId === this.id() && c.variantId !== null;
+            }, this)
 
-            if(variantCriteria){
-                loadVariants.call(this, variantCriteria)
+            if(variantsCriteria.length > 0){
+                loadVariants.call(this, variantsCriteria)
                 this.variants.areLoaded(true);
             }
         }
