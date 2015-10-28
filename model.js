@@ -1,7 +1,7 @@
 /**
  * Created by wilok on 05/10/15.
  */
- define('Model', ['knockout','lodash','SelectableNode','Variant', 'proxy', 'selection'], function(ko, _, SelectableNode, Variant, proxy, selection){
+ define('Model', ['knockout','lodash','SelectableNode','Variant', 'proxy'], function(ko, _, SelectableNode, Variant, proxy){
     function Model(id, name, manufacturer){
         SelectableNode.call(this, id, name);
         this.manufacturer = manufacturer;
@@ -10,7 +10,6 @@
         this.variants.selectedCount = ko.observable(0);
         this.isExpanded = ko.observable()
         this.date = ko.observable(null);
-        this.isExcluded = ko.observable(false);
 
         this.select.currentOnly = function(){
             this.date(new Date());
@@ -35,74 +34,45 @@
             }
         }.bind(this);
 
-        this.isSelected.subscribe(function(isSelected){
-            manageSelection.call(this, isSelected);
-        }, this);
-
-        function manageSelection(isSelected){
-            if(isSelected){
-                if(this.manufacturer.isSelected()){
-                    removeFromSelection.call(this, true);
-                    removeFromSelection.call(this, false);
-                }
-                else{
-                    addToSelection.call(this, false);
-                }
-            }
-            else{
-                if(this.manufacturer.isSelected()){
-                    addToSelection.call(this, true);
-                }
-                else{
-                    removeFromSelection.call(this, true);
-                    removeFromSelection.call(this, false);
-                }
-            }
-        }
-
-        this.exclude = function(){
-            this.isExcluded(true);
-            this.deselect();
-        }
-
         this.manufacturer.isSelected.subscribe(function(value){
-            if(value){ 
-                this.select();
-            }
-            else{
-                this.deselect();
-            }
-            this.isExcluded(false);
+            if(value){ this.select(); }
+            else{ this.deselect(); }
             this.date(this.manufacturer.date());
         }, this);
+
+        this.load = function(criteria){
+            var modelCriterion = _.find(criteria, function(criterion){
+                return criterion.modelId === this.id() && criterion.variantId === null;
+            })
+
+            if(modelCriterion){
+                this.date(modelCriterion.date);
+            }
+
+            var variantCriteria = _.find(criteria, function(criterion){
+                return criterion.modelId === this.id() && criterion.variantId !== null;
+            })
+
+            if(variantCriteria){
+                loadVariants.call(this, variantCriteria)
+                this.variants.areLoaded(true);
+            }
+        }
     }
 
-    function removeFromSelection(isExcluded){
-        _.remove(selection, function(item){
-            return item.modelId == this.id() && item.isExcluded == isExcluded;
-        }, this);
-    }
-
-    function addToSelection(isExcluded){
-        selection.push({ 
-            manufacturerId: this.manufacturer.id(),
-            modelId: this.id(),
-            date: this.date(),
-            isExcluded: isExcluded
-        }); 
-    }
-
-    function loadVariants(){
+    function loadVariants(variantCriteria){
         var variants = [];
         proxy.getVariants({}, function(response){
             for (var i = 0; i < response.length; i++) {
-                variants.push(createVariant.call(this, response[i]));
+                var variantResponse = response[i];
+                var criterion = _.find(variantCriteria, {variantId : variantResponse.Id});
+                variants.push(createVariant.call(this, response[i], criterion));
             }
         }.bind(this));
         this.variants(variants);
     };
 
-    function createVariant(value){
+    function createVariant(value, criterion){
         var variant = new Variant(value.Id, value.Name, this);
 
         variant.isSelected.subscribe(function(value){
@@ -115,13 +85,12 @@
             variant.select();
         }
 
-        if(this.isExcluded()){
-            variant.exclude();
-        }   
+        if(criterion){
+            variant.load(criterion);
+        }
 
         return variant;
     }
 
     return Model;
  });
-
