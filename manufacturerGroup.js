@@ -1,8 +1,8 @@
 /**
  * Created by wilok on 05/10/15.
  */
-define('ManufacturerGroup', ['knockout','Manufacturer', 'proxy', 'Node'], function(ko, Manufacturer, proxy, Node){
-    function ManufacturerGroup(id, name){
+define('ManufacturerGroup', ['knockout','Manufacturer', 'proxy', 'Node', 'lodash'], function(ko, Manufacturer, proxy, Node, _){
+    function ManufacturerGroup(id, name, selection){
         Node.call(this, id, name);
         this.manufacturers = ko.observable([]);
         this.manufacturers.areLoaded = ko.observable();
@@ -11,18 +11,23 @@ define('ManufacturerGroup', ['knockout','Manufacturer', 'proxy', 'Node'], functi
         this.toggleExpand = function(){
             this.isExpanded(!this.isExpanded());
             if(!this.manufacturers.areLoaded()) {
-                loadManufacturers.call(this);
+                loadManufacturers.call(this, selection);
                 this.manufacturers.areLoaded(true);
             };
         }.bind(this);
     }
 
-    function loadManufacturers(){
+    function loadManufacturers(selection){
         var manufacturers = [];
         proxy.getManufacturers({}, function(response){
             for (var i = 0; i < response.length; i++) {
-                var model = response[i];
-                manufacturers.push(new Manufacturer(model.Id, model.Name));
+                var manufacturerDto = response[i];
+                var manufacturer = new Manufacturer(manufacturerDto.Id, manufacturerDto.Name, selection);
+                var manufacturerCriteria = _.find(selection, { manufacturerId : manufacturerDto.Id});
+                if(manufacturerCriteria){
+                    manufacturer.load(manufacturerCriteria);
+                }
+                manufacturers.push(manufacturer);
             }
         }.bind(this));
         
@@ -31,4 +36,3 @@ define('ManufacturerGroup', ['knockout','Manufacturer', 'proxy', 'Node'], functi
 
     return ManufacturerGroup;
 });
-
