@@ -7,10 +7,6 @@
             background-color: #3a87ad;
         }
 
-        .excluded{
-            background-color: #b94a48;
-        }
-
         .selected.current-and-future, .selected.current-and-future.child-selected{
             background-color: #468847;
         }
@@ -30,27 +26,35 @@
     <div id="vehicle-selector">
         <ul data-bind="foreach: groups">
             <li>
-                <span data-bind="text: name, click: toggleExpand"></span>
+                [<span data-bind="text: name, click: toggleExpand"></span>]
                 <ul data-bind="visible: isExpanded, foreach: manufacturers">
                     <li>
-                        <span data-bind="text: name, click: toggleExpand,
-                         css: { selected: isSelected(), 'current-and-future': date() == null, 'child-selected':  hasSelectedModels() || hasSelectedVariants()}"></span>
+                        [<span data-bind="text: name, click: toggleExpand,
+                         css: { selected: isSelected(), 'current-and-future': date() == null, 'child-selected':  hasSelectedModels() || hasSelectedVariants()}"></span>]
                         <span data-bind="visible: hasSelectedVariants(), text: selectedVariantsCount"></span>
-                        <button data-bind="click: select.currentAndFuture, visible: !isSelected()">Select current and future</button>                        
-                        <button data-bind="click: select.currentOnly, visible: !isSelected()">Select current only</button>
+
+                        <button data-bind="click: select.currentAndFuture, 
+                                            visible: (!isSelected() || date() !== null) && $root.options.currentAndFutureSelection">Select current and future</button>                        
+                        <button data-bind="click: select.currentOnly, 
+                                            visible: (!isSelected() || date() === null) && $root.options.currentOnlySelection">Select current only</button>
+
                         <a data-bind="click: deselect, visible: isSelected">Remove All</a>
                         <ul data-bind="visible: isExpanded, foreach: models()">
                             <li>
-                                <span data-bind="text: name, click: toggleExpand,
-                                 css: { selected: isSelected(), 'current-and-future': date() == null, excluded: isExcluded(), 'child-selected': hasSelectedVariants() }"></span>
+                                [<span data-bind="text: name, click: toggleExpand,
+                                 css: { selected: isSelected(), 'current-and-future': date() == null, 'child-selected': hasSelectedVariants() }"></span>]
                                  <span data-bind="visible: hasSelectedVariants(), text: variants.selectedCount"></span>
-                                <button data-bind="click: select.currentAndFuture, visible:!isSelected()">Select current and future</button>
-                                <button data-bind="click: select.currentOnly, visible:!isSelected()">Select current only</button>
-                                <a data-bind="click: deselect, visible: isSelected() && !manufacturer.isSelected()">Remove All</a>                                
-                                <a data-bind="click: exclude, visible: isSelected() && manufacturer.isSelected()">Exclude All</a>
+
+                                <button data-bind="click: select.currentAndFuture, 
+                                                    visible: (!isSelected() || date() !== null) && $root.options.currentAndFutureSelection">Select current and future</button>
+
+                                <button data-bind="click: select.currentOnly, 
+                                                    visible: (!isSelected() || date() === null) && $root.options.currentOnlySelection">Select current only</button>
+
+                                <a data-bind="click: deselect, visible: isSelected()">Remove All</a>                                
                                 <ul data-bind="visible: isExpanded, foreach: variants">
                                     <li>
-                                        <span data-bind="text: name, click: toggleSelect, css: { selected: isSelected(), excluded: isExcluded() }"></span>
+                                        [<span data-bind="text: name, click: toggleSelect, css: { selected: isSelected() }"></span>]
                                     </li>
                                 </ul>
                             </li>
@@ -69,7 +73,6 @@
 <script src="proxy.js"></script>
 <script src="node.js"></script>
 <script src="selectableNode.js"></script>
-<script src="selection.js"></script>
 <script src="variant.js"></script>
 <script src="model.js"></script>
 <script src="manufacturer.js"></script>
